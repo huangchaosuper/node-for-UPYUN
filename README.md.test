@@ -1,0 +1,459 @@
+# Node-for-UPYUN
+
+[又拍云](https://www.upyun.com)Nodejs版本SDK
+
+##安装
+
+```Shell
+npm install node-for-upyun
+```
+
+##文件结构说明
+
+* lib
+	* logger.js `日志配置文件`
+	* Options.js `UpYun 功能选项`
+	* UpYun.js `SDK主文件`
+	* utils.js `内部使用功能函数集合`
+* logs
+	* debug.log `debug日志文件`
+	* exceptions.log `异常日志文件`
+* test
+	* file.js `普通文件单元测试`
+	* image.js `图像文件单元测试`
+	* system.js `系统函数单元测试`
+* image.png `图像测试资源`
+* package.json `Nodejs的配置文件`
+* README.md `ReadMe同时作为单元测试文件使用`
+
+##API介绍
+
+####初始化
+
+```js
+var UpYun = require("node-for-upyun");
+var upyun = new UpYun();
+<!--或者-->
+var upyun = new UpYun('userName','password','bucketName');
+```
+
+####获取SDK版本
+
+```js
+var assert = require("assert");
+var UpYun = require("node-for-upyun");
+var upyun = new UpYun();
+assert.equal('0.X.X',upyun.version);
+```
+
+####上传本地文件到Cloud
+
+>uploadFileFromStream(data,uri,callback)
+
+* data:上传文件数据流
+* uri:又拍云网络路径
+* callback(err,resHeaders,resData):回调函数
+	* err:错误信息，正常返回200
+	* resHeaders:通讯反馈报文头，API扩展使用
+	* resData:通讯反馈报文体，API扩展使用
+
+```js
+var UpYun = require("node-for-upyun");
+var upyun = new UpYun('userName','password','bucketName');
+upyun.uploadFileFromStream('Hello UpYun','README.md1',function(err,resHeaders,resData){
+	assert.equal(200,err);
+});
+```
+
+>uploadFileFromLocal(fileFullName,uri,callback)
+
+* fileFullName:本地文件路径
+* uri:又拍云网络路径
+* callback(err,resHeaders,resData):回调函数
+	* err:错误信息，正常返回200
+	* resHeaders:通讯反馈报文头，API扩展使用
+	* resData:通讯反馈报文体，API扩展使用
+
+```js
+var UpYun = require("node-for-upyun");
+<!--也可以这样初始化-->
+var upyun = new UpYun();
+upyun.options.userName = "userName";
+upyun.options.password = "password";
+upyun.options.bucketName = "bucketName";
+upyun.uploadFileFromLocal('README.md','README.md2',function(err,resHeaders,resData){
+	assert.equal(200,err);
+});
+```
+
+####下载Cloud文件到本地
+
+>downloadFileToStream(uri,callback)
+
+* uri:又拍云网络路径
+* callback(err,resHeaders,resData):回调函数
+	* err:错误信息，正常返回200
+	* resHeaders:通讯反馈报文头，API扩展使用
+	* resData:文件返回Stream信息
+
+```js
+var UpYun = require("node-for-upyun");
+var upyun = new UpYun('userName','password','bucketName');
+upyun.downloadFileToStream('README.md1',function(err,resHeaders,resData){
+	assert.equal(200,err);
+	assert.notEqual(resData.length,0);
+});
+```
+
+>downloadFileToLocal(fileFullName,uri,callback)
+
+* fileFullName:本地文件路径
+* uri:又拍云网络路径
+* callback(err,resHeaders,resData):回调函数
+	* err:错误信息，正常返回200
+	* resHeaders:通讯反馈报文头，API扩展使用
+	* resData:通讯反馈报文体，API扩展使用
+
+```js
+var UpYun = require("node-for-upyun");
+var upyun = new UpYun('userName','password','bucketName');
+upyun.downloadFileToLocal('README.md.test','README.md1',function(err,resHeaders,resData){
+	assert.equal(200,err);
+});
+```
+
+####获取Cloud文件信息
+
+>retrieveFileInformation(uri,callback)
+
+* uri:又拍云网络路径
+* callback(err,resHeaders,resData,resInformation{type,size,date}):回调函数
+	* err:错误信息，正常返回200
+	* resHeaders:通讯反馈报文头，API扩展使用
+	* resData:通讯反馈报文体，API扩展使用
+	* resInformation:文件信息
+		* type:文件类型
+		* size:文件大小
+		* date:文件最后更新时间(long类型)
+
+```js
+var UpYun = require("node-for-upyun");
+var upyun = new UpYun('userName','password','bucketName');
+upyun.downloadFileToLocal('README.md.test','README.md1',function(err,resHeaders,resData){
+	assert.equal(200,err);
+	assert.equal(resInformation.type,'file');
+	assert.equal(resInformation.size,9);
+	assert.ok(resInformation.date);
+});
+```
+
+####删除Cloud文件
+
+>deleteFile(uri,callback)
+
+* uri:又拍云网络路径
+* callback(err,resHeaders,resData):回调函数
+	* err:错误信息，正常返回200
+	* resHeaders:通讯反馈报文头，API扩展使用
+	* resData:通讯反馈报文体，API扩展使用
+
+```js
+var UpYun = require("node-for-upyun");
+var upyun = new UpYun('userName','password','bucketName');
+upyun.deleteFile('README.md',function(err,resHeaders,resData){
+	assert.equal(200,err);
+});
+```
+
+####创建Cloud文件夹
+
+>createDirectory(uri,callback)
+
+* uri:又拍云网络路径
+* callback(err,resHeaders,resData):回调函数
+	* err:错误信息，正常返回200
+	* resHeaders:通讯反馈报文头，API扩展使用
+	* resData:通讯反馈报文体，API扩展使用
+
+```js
+var UpYun = require("node-for-upyun");
+var upyun = new UpYun('userName','password','bucketName');
+upyun.createDirectory('README/md',function(err,resHeaders,resData){
+	assert.equal(200,err);
+	upyun.options.clear();
+});
+```
+
+由于创建文件夹操作会自动开启`folder`开关，因此调用结束后需要执行`upyun.options.clear()`或者`upyun.options.headers.folder = false`关闭此选项。不同功能的并发操作时建议使用`new UpYun()`，相同功能并发操作时使用相同实例可以提高性能。
+
+####删除Cloud文件夹
+
+>removeDirectory(uri,callback)
+
+* uri:又拍云网络路径
+* callback(err,resHeaders,resData):回调函数
+	* err:错误信息，正常返回200
+	* resHeaders:通讯反馈报文头，API扩展使用
+	* resData:通讯反馈报文体，API扩展使用
+
+```js
+var UpYun = require("node-for-upyun");
+var upyun = new UpYun('userName','password','bucketName');
+upyun.removeDirectory('README/md',function(err,resHeaders,resData){
+	assert.equal(200,err);
+});
+```
+
+####获取Cloud目录文件列表信息
+
+>listStructure(uri,callback)
+
+* uri:又拍云网络路径
+* callback(err,resHeaders,resData,resInformations[{name,type,size,date}]):回调函数
+	* err:错误信息，正常返回200
+	* resHeaders:通讯反馈报文头，API扩展使用
+	* resData:通讯反馈报文体，API扩展使用
+	* resInformations:目录结构数组
+		* name:文件/目录名称
+		* type:N (文件)，F (目录)
+		* size:文件/目录大小
+		* date:最后更新时间(long类型)
+
+```js
+upyun.listStructure('README',function(err,resHeaders,resData,resInformations){
+	assert.equal(200,err);
+	assert.notEqual(resInformations.length,0);
+	assert.ok(resInformations[0].name);
+	assert.ok(resInformations[0].type);
+	assert.ok(resInformations[0].size);
+	assert.ok(resInformations[0].date);
+});
+```
+
+####获取Cloud空间使用信息
+
+>listStructure(uri,callback)
+
+* callback(err,resHeaders,resData):回调函数
+	* err:错误信息，正常返回200
+	* resHeaders:通讯反馈报文头，API扩展使用
+	* resData:空间使用情况(B为单位)
+
+```js
+upyun.retrieveCloudUsage(function(err,resHeaders,resData){
+	assert.equal(200,err);
+	assert.notEqual(resData.length,0);
+});
+```
+
+####图片上传附加信息
+
+>uploadImageFromStream(data,uri,callback)
+
+* data:上传文件数据流
+* uri:又拍云网络路径
+* callback(err,resHeaders,resData,resInformation):回调函数
+	* err:错误信息，正常返回200
+	* resHeaders:通讯反馈报文头，API扩展使用
+	* resData:通讯反馈报文体，API扩展使用
+	* resInformation:附加信息
+		* width:图片宽度
+		* height:图片高度
+		* frames:图片帧数
+		* type:图片类型
+
+```js
+var fs = require('fs');
+var data = fs.readFileSync('image.png');
+upyun.uploadImageFromLocal(data,'image1.png',function(err,resHeaders,resData,resInfomration){
+	assert.equal(96,resInfomration.width);
+	assert.equal(96,resInfomration.height);
+	assert.equal(1,resInfomration.frames);
+	assert.equal('PNG',resInfomration.type);
+	assert.equal(200,err);
+});
+```
+
+>uploadImageFromLocal(data,uri,callback)
+
+* data:上传文件数据流
+* uri:又拍云网络路径
+* callback(err,resHeaders,resData,resInformation):回调函数
+	* err:错误信息，正常返回200
+	* resHeaders:通讯反馈报文头，API扩展使用
+	* resData:通讯反馈报文体，API扩展使用
+	* resInformation:附加信息
+		* width:图片宽度
+		* height:图片高度
+		* frames:图片帧数
+		* type:图片类型
+
+```js
+upyun.uploadImageFromLocal('image.png','image1.png',function(err,resHeaders,resData,resInfomration){
+	assert.equal(96,resInfomration.width);
+	assert.equal(96,resInfomration.height);
+	assert.equal(1,resInfomration.frames);
+	assert.equal('PNG',resInfomration.type);
+	assert.equal(200,err);
+});
+```
+
+####附加功能配置
+
+>切换连接服务器
+
+```js
+upyun.options.domain = upyun.options.domain_CTCC;//切换为电信
+upyun.options.domain = upyun.options.domain_CUCC;//切换为联通
+upyun.options.domain = upyun.options.domain_CMCC;//切换为移动
+```
+
+>清除附加功能配置痕迹
+
+```js
+upyun.options.clear()
+```
+
+>自动创建不存在的父级目录。最多允许创建 10 级目录(默认开启)
+
+```js
+upyun.options.headers.mkdir = true;
+```
+
+>手动修改上传文件类型
+
+```js
+upyun.options.headers['Content-Type'] = 'SVG';
+```
+
+>开启MD5校验
+
+```js
+upyun.options.md5 = true;
+```
+
+#####图片附加功能配置
+
+>清除图片附加功能配置痕迹
+
+```js
+upyun.options.imageClear();
+```
+
+>限定宽度,高度自适应
+
+```js
+upyun.options.imageFixWidth(width);
+```
+
+>限定高度,宽度自适应
+
+```js
+upyun.options.imageFixHeight(height);
+```
+
+>限定宽度和高度，宽高不足时不缩放
+
+```js
+upyun.options.imageFixWidthOrHeight(width,height);
+```
+
+>固定宽度和高度，宽高不足时强行缩放
+
+```js
+upyun.options.imageFixBoth(width,height);
+```
+
+>限定最长边,短边自适应
+
+```js
+upyun.options.imageFixMax(size);
+```
+
+>限定最短边,长边自适应
+
+```js
+upyun.options.imageFixMin(size);
+```
+
+>等比例缩放（1-99）
+
+```js
+upyun.options.imageFixScale(scale);
+```
+
+>图片压缩质量，默认 95(1-100)
+
+```js
+upyun.options.imageQuality(scale);
+```
+
+>图片锐化，默认开启锐化
+
+```js
+upyun.options.imageUnSharp();
+```
+
+>自定义的缩略图版本名称，比如 `small`
+
+需要在 UPYUN 管理平台创建好缩略图版本该缩略方式包含了所需的缩略参数，参数更简洁，使用更方便，建议使用
+
+```js
+upyun.options.imageThumbnail();
+```
+
+>是否保留原图的 EXIF 信息若原图带有 EXIF 信息并做缩略处理时，默认将删除 EXIF 信息
+
+```js
+upyun.options.imageKeepExif();
+```
+
+>图片旋转，默认参数为auto
+
+只接受“auto”，“90”，“180”，“270”四种参数，其他参数都视为错误
+
+```js
+upyun.options.imageRotate(type);
+```
+
+>图片裁剪，默认参数为(0,0,0,0)
+
+(x,y)：左上角坐标；width：要裁剪的宽度；height：要裁剪的高度x >= 0 && y >=0 && width > 0 && height > 0 且必须是正整型
+
+```js
+upyun.options.imageCrop(x,y,width,height);
+```
+
+###标准API错误代码表
+
+| HTTP状态码 |  返回代码  |  描述   |
+| ------------ | ---------- | ---------- |
+| 400 | Bad Request | 错误请求(如 URL 缺少空间名) |
+| 401 | Unauthorized | 访问未授权 |
+| 401 | Sign error | 签名错误(操作员和密码,或签名格式错误) |
+| 401 | Need Date Header | 发起的请求缺少 Date 头信息 |
+| 401 | Date offset error | 发起请求的服务器时间错误，请检查服务器时间是否与世界时间一致|
+| 403 | Not Access | 权限错误(如非图片文件上传到图片空间)|
+| 403 | File size too max | 单个文件超出大小(100Mb 以内) |
+| 403 | Not a Picture File | 图片类空间错误码，非图片文件或图片文件格式错误。针对图片空间只允许上传 jpg/png/gif/bmp/tif 格式。|
+| 403 | Picture Size too max | 图片类空间错误码，图片尺寸太大。针对图片空间，图片总像素在 200000000 以内。|
+| 403 | Bucket full | 空间已用满 |
+| 403 | Bucket blocked | 空间被禁用,请联系管理员|
+| 403 | User blocked | 操作员被禁用|
+| 403 | Image Rotate Invalid Parameters | 图片旋转参数错误|
+| 403 | Image Crop Invalid Parameters | 图片裁剪参数错误|
+| 404 | Not Found | 获取文件或目录不存在；上传文件或目录时上级目录不存在|
+| 406 | Not Acceptable(path) | 目录错误（创建目录时已存在同名文件；或上传文件时存在同名目录)|
+| 503 | System Error | 系统错误 |
+
+##TODO
+
+#####https连接
+
+#####HTTP基本认证
+
+#####content-secret
+
+
+
+更多资源，请关注：[http://blog.huangchaosuper.cn](http://blog.huangchaosuper.cn)

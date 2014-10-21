@@ -1,0 +1,23 @@
+{
+  "name": "node-for-upyun",
+  "version": "0.0.7",
+  "description": "SDK of UPYUN",
+  "main": "./lib/UpYun",
+  "scripts": {
+    "test": "mocha test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitcafe.com/huangchaosuper/node-for-UPYUN.git"
+  },
+  "keywords": [
+    "UPYUN",
+    "SDK"
+  ],
+  "dependencies": {
+    "mocha":"*",
+    "winston":"*"
+  },
+  "author": "huangchaosuper",
+  "license": "BSD-2-Clause"
+}
